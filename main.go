@@ -1,13 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
+
+	"github.com/dhaaana/go-http-server/config"
+	"github.com/dhaaana/go-http-server/router"
+	"github.com/dhaaana/go-http-server/utils"
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, World!")
-	})
-	http.ListenAndServe("localhost:8000", nil)
+	serverPort := config.GetEnvVariables("PORT")
+
+	http.Handle("/", router.Handler)
+
+	utils.LogInfo("Server started on " + serverPort)
+	http.ListenAndServe(":"+serverPort, nil)
 }
