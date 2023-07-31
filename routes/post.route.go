@@ -7,5 +7,8 @@ import (
 
 func PostRoutes(r *app.Router) {
 	r.Get("/posts", controllers.GetAllPosts)
-	r.Get("/posts/sample", controllers.CreateSamplePost)
+	r.Post("/posts", controllers.CreatePost)
+	r.Get("/posts/:id", controllers.GetPostByID)
+	r.Put("/posts/:id", controllers.UpdatePost)
+	r.Delete("/posts/:id", controllers.DeletePost)
 }

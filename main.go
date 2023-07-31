@@ -28,8 +28,7 @@ func main() {
 	r := app.NewRouter()
 	routes.HomeRoutes(r)
 	routes.PostRoutes(r)
-	http.Handle("/", r)
 
 	utils.LogInfo("Server started on " + serverPort)
-	http.ListenAndServe(":"+serverPort, nil)
+	http.ListenAndServe(":"+serverPort, r)
 }

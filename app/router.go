@@ -2,6 +2,7 @@ package app
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/dhaaana/go-http-server/middleware"
 )
@@ -24,11 +25,21 @@ func (r *Router) Post(path string, handler http.HandlerFunc) {
 	r.addRoute(http.MethodPost, path, handler)
 }
 
+func (r *Router) Put(path string, handler http.HandlerFunc) {
+	r.addRoute(http.MethodPut, path, handler)
+}
+
+func (r *Router) Delete(path string, handler http.HandlerFunc) {
+	r.addRoute(http.MethodDelete, path, handler)
+}
+
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if handlers, ok := r.routes[req.Method]; ok {
-		if handler, ok := handlers[req.URL.Path]; ok {
-			handler(w, req)
-			return
+		for path, handler := range handlers {
+			if matchPath(path, req.URL.Path) {
+				handler(w, req)
+				return
+			}
 		}
 	}
 	http.NotFound(w, req)
@@ -40,4 +51,26 @@ func (r *Router) addRoute(method, path string, handler http.HandlerFunc) {
 	}
 
 	r.routes[method][path] = middleware.Logging(handler)
+}
+
+func matchPath(routePath, reqPath string) bool {
+	routeParts := strings.Split(routePath, "/")
+	reqParts := strings.Split(reqPath, "/")
+
+	if len(routeParts) != len(reqParts) {
+		return false
+	}
+
+	for i := 0; i < len(routeParts); i++ {
+		if strings.HasPrefix(routeParts[i], ":") {
+			// Named parameter, skip
+			continue
+		}
+
+		if routeParts[i] != reqParts[i] {
+			return false
+		}
+	}
+
+	return true
 }
