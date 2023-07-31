@@ -1,33 +1,56 @@
 package config
 
 import (
+	"fmt"
 	"log"
+	"os"
+	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
-func GetEnvVariables(key string) string {
+func GetEnvVariablesFromFile(key string) string {
 	viper.SetConfigFile(".env")
 
-	// Find and read the config file
 	err := viper.ReadInConfig()
 
 	if err != nil {
 		log.Fatalf("Error while reading config file %s", err)
 	}
 
-	// viper.Get() returns an empty interface{}
-	// to get the underlying type of the key,
-	// we have to do the type assertion, we know the underlying value is string
-	// if we type assert to other type it will throw an error
 	value, ok := viper.Get(key).(string)
 
-	// If the type is a string then ok will be true
-	// ok will make sure the program not break
 	if !ok {
 		log.Fatalf("Invalid type assertion")
 	}
 
 	return value
 
+}
+
+func LoadEnv() error {
+	err := godotenv.Load()
+	if err != nil {
+		return fmt.Errorf("error loading .env file: %w", err)
+	}
+	return nil
+}
+
+func GetEnvVariables(k string) (string, error) {
+	v := os.Getenv(k)
+	if v == "" {
+		return "", fmt.Errorf("%s environment variable not set", k)
+	}
+	return v, nil
+}
+
+func GetEnvBool(key string) (bool, error) {
+	value := strings.ToLower(os.Getenv(key))
+	if value == "true" {
+		return true, nil
+	} else if value == "false" {
+		return false, nil
+	}
+	return false, fmt.Errorf("invalid boolean value for environment variable %s: %s", key, value)
 }

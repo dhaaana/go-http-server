@@ -26,3 +26,6 @@ go.work
 
 # sqlite database file
 *.db
+
+# google cloud yaml
+app.yaml
