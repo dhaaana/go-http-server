@@ -12,6 +12,7 @@ import (
 func main() {
 	serverPort := config.GetEnvVariables("PORT")
 
+	app.InitDB()
 	r := app.NewRouter()
 
 	routes.HomeRoutes(r)

@@ -9,4 +9,7 @@ func HomeRoutes(r *app.Router) {
 	r.Get("/", controllers.GetHomeData)
 	r.Get("/alternate", controllers.GetAlternateHomeData)
 	r.Post("/", controllers.PostHomeData)
+
+	r.Get("/posts", controllers.GetAllPosts)
+	r.Get("/posts/sample", controllers.CreateSamplePost)
 }
