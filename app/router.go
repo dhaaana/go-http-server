@@ -34,6 +34,15 @@ func (r *Router) Delete(path string, handler http.HandlerFunc) {
 }
 
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	// Handle OPTIONS request for CORS preflight
+	if req.Method == http.MethodOptions {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	if handlers, ok := r.routes[req.Method]; ok {
 		for path, handler := range handlers {
 			if matchPath(path, req.URL.Path) {
@@ -50,7 +59,7 @@ func (r *Router) addRoute(method, path string, handler http.HandlerFunc) {
 		r.routes[method] = make(map[string]http.HandlerFunc)
 	}
 
-	r.routes[method][path] = middleware.Logging(handler)
+	r.routes[method][path] = middleware.Logging(middleware.Cors(handler))
 }
 
 func matchPath(routePath, reqPath string) bool {

@@ -59,11 +59,18 @@ func InitDB() {
 
 func createTable() {
 	sqlStmt := `
+		CREATE TABLE IF NOT EXISTS users (
+			id SERIAL PRIMARY KEY,
+			password TEXT NOT NULL,
+			email TEXT UNIQUE NOT NULL,
+			name TEXT NOT NULL
+		);
+		
 		CREATE TABLE IF NOT EXISTS posts (
 			id SERIAL PRIMARY KEY,
 			title TEXT,
 			body TEXT,
-			userId INTEGER
+			userId INTEGER REFERENCES users(id) ON DELETE CASCADE
 		);
 	`
 	_, err := db.Exec(sqlStmt)
