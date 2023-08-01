@@ -45,7 +45,7 @@ func GetUserIDFromToken(r *http.Request) (int, error) {
 	})
 
 	if err != nil || !token.Valid {
-		return 0, errors.New("invalid or expired token: " + err.Error())
+		return 0, errors.New("invalid or expired token ")
 	}
 
 	// Extract the user ID from the token claims

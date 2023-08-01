@@ -24,6 +24,16 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var existingUserID int
+	err := db.QueryRow("SELECT id FROM users WHERE email = $1", user.Email).Scan(&existingUserID)
+	if err == nil {
+		utils.JsonResponse(w, http.StatusConflict, "Email already exists", nil)
+		return
+	} else if err != sql.ErrNoRows {
+		utils.JsonResponse(w, http.StatusInternalServerError, "Error checking email existence", nil)
+		return
+	}
+
 	sqlStmt := `
 		INSERT INTO users (password, email, name) 
 		VALUES ($1, $2, $3)
@@ -31,7 +41,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	`
 
 	var userID int
-	err := db.QueryRow(sqlStmt, user.Password, user.Email, user.Name).Scan(&userID)
+	err = db.QueryRow(sqlStmt, user.Password, user.Email, user.Name).Scan(&userID)
 	if err != nil {
 		utils.JsonResponse(w, http.StatusInternalServerError, "Error registering user: "+err.Error(), nil)
 		return
